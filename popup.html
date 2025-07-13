@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Reader Settings</title>
+    <style>
+        body {
+            width: 300px;
+            padding: 15px;
+            font-family: Arial, sans-serif;
+        }
+        .setting-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .slider-container input[type="range"] {
+            flex: 1;
+        }
+        .slider-container span {
+            min-width: 30px;
+            text-align: right;
+        }
+        button {
+            width: 100%;
+            padding: 8px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .test-area {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Text Reader Settings</h2>
+    
+    <div class="setting-group">
+        <label for="languageSelect">Language:</label>
+        <select id="languageSelect">
+            <option value="">All Languages</option>
+        </select>
+    </div>
+    <div class="setting-group">
+        <label for="voiceSelect">Voice:</label>
+        <select id="voiceSelect">
+            <option value="">Loading voices...</option>
+        </select>
+    </div>
+    
+    <div class="setting-group">
+        <label>Speed:</label>
+        <div class="slider-container">
+            <input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="1">
+            <span id="speedValue">1.0</span>
+        </div>
+    </div>
+    
+    <div class="setting-group">
+        <label>Pitch:</label>
+        <div class="slider-container">
+            <input type="range" id="pitchSlider" min="0.5" max="2" step="0.1" value="1">
+            <span id="pitchValue">1.0</span>
+        </div>
+    </div>
+    
+    <div class="setting-group">
+        <label>Volume:</label>
+        <div class="slider-container">
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+            <span id="volumeValue">1.0</span>
+        </div>
+    </div>
+    
+    <div class="test-area">
+        <label for="testText">Test Text:</label>
+        <textarea id="testText" rows="3" placeholder="Enter text to test the voice settings...">Hello! This is a test of the text reader extension.</textarea>
+        <button id="testButton">Test Voice</button>
+        <button id="stopButton" style="background:#f44336;margin-top:8px;">Stop</button>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html> 

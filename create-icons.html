@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Icons</title>
+</head>
+<body>
+    <h2>Text Reader Extension Icons</h2>
+    <p>Right-click on each canvas below and "Save image as" to create the icon files:</p>
+    
+    <h3>16x16 Icon (icon16.png)</h3>
+    <canvas id="icon16" width="16" height="16"></canvas>
+    
+    <h3>48x48 Icon (icon48.png)</h3>
+    <canvas id="icon48" width="48" height="48"></canvas>
+    
+    <h3>128x128 Icon (icon128.png)</h3>
+    <canvas id="icon128" width="128" height="128"></canvas>
+
+    <script>
+        function drawIcon(canvasId, size) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Background
+            ctx.fillStyle = '#4CAF50';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Speaker icon
+            ctx.fillStyle = 'white';
+            const margin = size * 0.2;
+            const iconSize = size - (margin * 2);
+            
+            // Draw speaker cone
+            ctx.beginPath();
+            ctx.moveTo(margin + iconSize * 0.3, margin + iconSize * 0.3);
+            ctx.lineTo(margin + iconSize * 0.1, margin + iconSize * 0.5);
+            ctx.lineTo(margin + iconSize * 0.3, margin + iconSize * 0.7);
+            ctx.fill();
+            
+            // Draw speaker body
+            ctx.fillRect(margin + iconSize * 0.3, margin + iconSize * 0.35, iconSize * 0.15, iconSize * 0.3);
+            
+            // Draw sound waves
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = size * 0.02;
+            ctx.beginPath();
+            ctx.arc(margin + iconSize * 0.6, margin + iconSize * 0.5, iconSize * 0.15, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.arc(margin + iconSize * 0.75, margin + iconSize * 0.5, iconSize * 0.2, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        
+        // Generate all icons
+        drawIcon('icon16', 16);
+        drawIcon('icon48', 48);
+        drawIcon('icon128', 128);
+    </script>
+</body>
+</html> 
