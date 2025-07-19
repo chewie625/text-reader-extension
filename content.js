@@ -3,6 +3,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "readAloud") {
     readTextAloud(request.text);
   }
+  if (request.action === "stopReading") {
+    window.speechSynthesis.cancel();
+    chrome.runtime.sendMessage({ action: "readingStopped" });
+  }
 });
 
 // Function to read text aloud using Web Speech API
@@ -29,7 +33,18 @@ function readTextAloud(text) {
   if (preferredVoice) {
     utterance.voice = preferredVoice;
   }
-  
+
+  // Notify background that reading started
+  chrome.runtime.sendMessage({ action: "readingStarted" });
+
+  // When reading ends, notify background
+  utterance.onend = function() {
+    chrome.runtime.sendMessage({ action: "readingStopped" });
+  };
+  utterance.onerror = function() {
+    chrome.runtime.sendMessage({ action: "readingStopped" });
+  };
+
   // Speak the text
   window.speechSynthesis.speak(utterance);
   

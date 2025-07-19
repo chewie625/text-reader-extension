@@ -131,9 +131,16 @@ function setupEventListeners() {
 
     // Stop button
     document.getElementById('stopButton').addEventListener('click', function() {
+        // Stop speech in the popup (if any)
         if (speechSynthesis.speaking) {
             speechSynthesis.cancel();
         }
+        // Tell all tabs to stop speech
+        chrome.tabs.query({}, function(tabs) {
+            for (let tab of tabs) {
+                chrome.tabs.sendMessage(tab.id, { action: "stopReading" });
+            }
+        });
     });
 }
 
