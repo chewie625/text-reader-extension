@@ -7,15 +7,16 @@ function updateReadAloudMenuLabel() {
   let label = 'Read out loud';
   if (currentVoiceLang) {
     try {
-      const displayNames = new Intl.DisplayNames([navigator.language], { type: 'language' });
-      // Use only the language part (e.g., 'de' from 'de-DE')
-      const langPart = currentVoiceLang.split('-')[0];
-      const languageName = displayNames.of(langPart);
-      if (languageName) {
-        label = `Read out loud (${languageName})`;
+      const [langPart, regionPart] = currentVoiceLang.split('-');
+      const displayNamesLang = new Intl.DisplayNames([navigator.language], { type: 'language' });
+      const displayNamesRegion = new Intl.DisplayNames([navigator.language], { type: 'region' });
+      let languageName = displayNamesLang.of(langPart) || langPart;
+      if (regionPart) {
+        const regionName = displayNamesRegion.of(regionPart.toUpperCase());
+        if (regionName) languageName += ` (${regionName})`;
       }
+      label = `Read out loud (${languageName})`;
     } catch (e) {
-      // Fallback: just show the language code
       label = `Read out loud (${currentVoiceLang})`;
     }
   }

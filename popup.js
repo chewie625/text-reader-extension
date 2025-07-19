@@ -24,12 +24,21 @@ function loadVoices() {
     }
 
     // Populate language dropdown
-    const languages = Array.from(new Set(allVoices.map(v => v.lang))).sort();
+    const languageCodes = Array.from(new Set(allVoices.map(v => v.lang))).sort();
+    const displayNamesLang = new Intl.DisplayNames([navigator.language], { type: 'language' });
+    const displayNamesRegion = new Intl.DisplayNames([navigator.language], { type: 'region' });
+
     languageSelect.innerHTML = '<option value="">All Languages</option>';
-    languages.forEach(lang => {
+    languageCodes.forEach(lang => {
         const option = document.createElement('option');
         option.value = lang;
-        option.textContent = lang;
+        const [langPart, regionPart] = lang.split('-');
+        let label = displayNamesLang.of(langPart) || langPart;
+        if (regionPart) {
+            const regionName = displayNamesRegion.of(regionPart.toUpperCase());
+            if (regionName) label += ` (${regionName})`;
+        }
+        option.textContent = label;
         languageSelect.appendChild(option);
     });
 
