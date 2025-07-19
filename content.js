@@ -9,6 +9,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+// Listen for Delete key to stop reading
+window.addEventListener('keydown', function(event) {
+  if (event.key === 'Delete') {
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      chrome.runtime.sendMessage({ action: "readingStopped" });
+    }
+  }
+});
+
 // Function to read text aloud using Web Speech API
 function readTextAloud(text) {
   // Stop any existing speech
@@ -18,38 +28,39 @@ function readTextAloud(text) {
 
   // Create a new speech synthesis utterance
   const utterance = new SpeechSynthesisUtterance(text);
-  
-  // Configure speech settings
-  utterance.rate = 1.0; // Speed (0.1 to 10)
-  utterance.pitch = 1.0; // Pitch (0 to 2)
-  utterance.volume = 1.0; // Volume (0 to 1)
-  
-  // Try to use a natural-sounding voice if available
-  const voices = window.speechSynthesis.getVoices();
-  const preferredVoice = voices.find(voice => 
-    voice.lang.includes('en') && voice.name.includes('Natural')
-  ) || voices.find(voice => voice.lang.includes('en')) || voices[0];
-  
-  if (preferredVoice) {
-    utterance.voice = preferredVoice;
-  }
 
-  // Notify background that reading started
-  chrome.runtime.sendMessage({ action: "readingStarted" });
+  // Get user-selected voice and settings from storage
+  chrome.storage.sync.get({
+    selectedVoice: 0,
+    speed: 1.0,
+    pitch: 1.0,
+    volume: 1.0
+  }, function(items) {
+    const voices = window.speechSynthesis.getVoices();
+    if (voices[items.selectedVoice]) {
+      utterance.voice = voices[items.selectedVoice];
+    }
+    utterance.rate = items.speed;
+    utterance.pitch = items.pitch;
+    utterance.volume = items.volume;
 
-  // When reading ends, notify background
-  utterance.onend = function() {
-    chrome.runtime.sendMessage({ action: "readingStopped" });
-  };
-  utterance.onerror = function() {
-    chrome.runtime.sendMessage({ action: "readingStopped" });
-  };
+    // Notify background that reading started
+    chrome.runtime.sendMessage({ action: "readingStarted" });
 
-  // Speak the text
-  window.speechSynthesis.speak(utterance);
-  
-  // Optional: Add visual feedback
-  showReadingIndicator();
+    // When reading ends, notify background
+    utterance.onend = function() {
+      chrome.runtime.sendMessage({ action: "readingStopped" });
+    };
+    utterance.onerror = function() {
+      chrome.runtime.sendMessage({ action: "readingStopped" });
+    };
+
+    // Speak the text
+    window.speechSynthesis.speak(utterance);
+
+    // Optional: Add visual feedback
+    showReadingIndicator();
+  });
 }
 
 // Function to show visual feedback that text is being read

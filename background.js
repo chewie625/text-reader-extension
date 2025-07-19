@@ -1,5 +1,26 @@
 // Create context menu when extension is installed
 let readingTabs = {};
+let currentVoiceLang = null;
+let currentVoiceLabel = null;
+
+function updateReadAloudMenuLabel() {
+  let label = 'Read out loud';
+  if (currentVoiceLang) {
+    try {
+      const displayNames = new Intl.DisplayNames([navigator.language], { type: 'language' });
+      // Use only the language part (e.g., 'de' from 'de-DE')
+      const langPart = currentVoiceLang.split('-')[0];
+      const languageName = displayNames.of(langPart);
+      if (languageName) {
+        label = `Read out loud (${languageName})`;
+      }
+    } catch (e) {
+      // Fallback: just show the language code
+      label = `Read out loud (${currentVoiceLang})`;
+    }
+  }
+  chrome.contextMenus.update('readAloud', { title: label });
+}
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
@@ -31,15 +52,20 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-// Listen for messages from content scripts about reading state
+// Listen for messages from content scripts about reading state and selected voice
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (!sender.tab) return;
-  const tabId = sender.tab.id;
-  if (message.action === "readingStarted") {
-    readingTabs[tabId] = true;
-    chrome.contextMenus.update("stopReading", { enabled: true });
-  } else if (message.action === "readingStopped") {
-    readingTabs[tabId] = false;
-    chrome.contextMenus.update("stopReading", { enabled: false });
+  if (message.action === "voiceChanged") {
+    currentVoiceLang = message.lang || null;
+    updateReadAloudMenuLabel();
+  }
+  if (sender.tab) {
+    const tabId = sender.tab.id;
+    if (message.action === "readingStarted") {
+      readingTabs[tabId] = true;
+      chrome.contextMenus.update("stopReading", { enabled: true });
+    } else if (message.action === "readingStopped") {
+      readingTabs[tabId] = false;
+      chrome.contextMenus.update("stopReading", { enabled: false });
+    }
   }
 }); 

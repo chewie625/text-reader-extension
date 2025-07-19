@@ -91,6 +91,14 @@ function setupEventListeners() {
         chrome.storage.sync.set({
             selectedVoice: parseInt(this.value)
         });
+        // Notify background of the new voice's language
+        const selectedVoiceIndex = parseInt(this.value);
+        if (allVoices[selectedVoiceIndex]) {
+            chrome.runtime.sendMessage({
+                action: 'voiceChanged',
+                lang: allVoices[selectedVoiceIndex].lang || null
+            });
+        }
     });
     
     // Speed slider
