@@ -15,33 +15,26 @@ function readTextAloud(text) {
   // Create a new speech synthesis utterance
   const utterance = new SpeechSynthesisUtterance(text);
   
-  // Load saved settings and apply them
-  chrome.storage.sync.get({
-    selectedVoice: 0,
-    speed: 1.0,
-    pitch: 1.0,
-    volume: 1.0
-  }, function(items) {
-    // Apply voice setting
-    const voices = window.speechSynthesis.getVoices();
-    if (voices[items.selectedVoice]) {
-      utterance.voice = voices[items.selectedVoice];
-    } else if (voices.length > 0) {
-      // Fallback to first available voice
-      utterance.voice = voices[0];
-    }
-    
-    // Apply other settings
-    utterance.rate = items.speed;
-    utterance.pitch = items.pitch;
-    utterance.volume = items.volume;
-    
-    // Speak the text
-    window.speechSynthesis.speak(utterance);
-    
-    // Optional: Add visual feedback
-    showReadingIndicator();
-  });
+  // Configure speech settings
+  utterance.rate = 1.0; // Speed (0.1 to 10)
+  utterance.pitch = 1.0; // Pitch (0 to 2)
+  utterance.volume = 1.0; // Volume (0 to 1)
+  
+  // Try to use a natural-sounding voice if available
+  const voices = window.speechSynthesis.getVoices();
+  const preferredVoice = voices.find(voice => 
+    voice.lang.includes('en') && voice.name.includes('Natural')
+  ) || voices.find(voice => voice.lang.includes('en')) || voices[0];
+  
+  if (preferredVoice) {
+    utterance.voice = preferredVoice;
+  }
+  
+  // Speak the text
+  window.speechSynthesis.speak(utterance);
+  
+  // Optional: Add visual feedback
+  showReadingIndicator();
 }
 
 // Function to show visual feedback that text is being read
