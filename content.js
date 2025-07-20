@@ -17,6 +17,19 @@ window.addEventListener('keydown', function(event) {
       chrome.runtime.sendMessage({ action: "readingStopped" });
     }
   }
+  // Listen for 'r' key to read selected text
+  if (event.key === 'r' && !event.ctrlKey && !event.altKey && !event.metaKey && !event.shiftKey) {
+    // Only trigger if focus is not in an input, textarea, or contenteditable
+    const active = document.activeElement;
+    const isEditable = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
+    if (!isEditable) {
+      const selection = window.getSelection();
+      const selectedText = selection ? selection.toString().trim() : '';
+      if (selectedText) {
+        readTextAloud(selectedText);
+      }
+    }
+  }
 });
 
 // Function to read text aloud using Web Speech API
